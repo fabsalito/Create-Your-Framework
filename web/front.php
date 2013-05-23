@@ -7,6 +7,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing;
+use Symfony\Component\HttpKernel;
 
 function render_template($request)
 {
@@ -16,7 +17,7 @@ function render_template($request)
  
     return new Response(ob_get_clean());
 }
- 
+
 // crea petición desde globales PHP
 $request = Request::createFromGlobals();
 
@@ -29,13 +30,26 @@ $context->fromRequest($request);
 
 // crea nuevo matcher seteando contexto y la tabla de rutas de la app
 $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
- 
+
+// crea un controller resolver
+$resolver = new HttpKernel\Controller\ControllerResolver();
+
 try {
     // añade a los atributos de la petición la información del path
     $request->attributes->add($matcher->match($request->getPathInfo()));
 
+    // obtiene el controller 
+    $controller = $resolver->getController($request);
+
+    //var_dump($controller); die;
+
+    //obtiene los argumentos para el controller
+    $arguments = $resolver->getArguments($request, $controller);
+
+    //var_dump($arguments); die;
+
     // llama a render_template pasando la petición como parámetro
-    $response = call_user_func($request->attributes->get('_controller'), $request);
+    $response = call_user_func_array($controller, $arguments);
 
 } catch (Routing\Exception\ResourceNotFoundException $e) {
     // crea respuesta para página no encontrada
