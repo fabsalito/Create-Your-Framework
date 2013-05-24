@@ -34,32 +34,11 @@ $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 // crea un controller resolver
 $resolver = new HttpKernel\Controller\ControllerResolver();
 
-try {
-    // añade a los atributos de la petición la información del path
-    $request->attributes->add($matcher->match($request->getPathInfo()));
+// crea una instancia del framework
+$framework = new Simplex\Framework($matcher, $resolver);
 
-    // obtiene el controller 
-    $controller = $resolver->getController($request);
-
-    //var_dump($controller); die;
-
-    //obtiene los argumentos para el controller
-    $arguments = $resolver->getArguments($request, $controller);
-
-    //var_dump($arguments); die;
-
-    // llama a render_template pasando la petición como parámetro
-    $response = call_user_func_array($controller, $arguments);
-
-} catch (Routing\Exception\ResourceNotFoundException $e) {
-    // crea respuesta para página no encontrada
-    $response = new Response('Not Found', 404);
-
-} catch (Exception $e) {
-    // crea respuesta para excepción
-    $response = new Response('An error occurred', 500);
-
-}
+// usa el handle del framework para resolver el request en un response
+$response = $framework->handle($request);
 
 //var_dump($response);die;
  
