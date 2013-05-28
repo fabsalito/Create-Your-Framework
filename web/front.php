@@ -26,21 +26,33 @@ function render_template($request)
 // crea petición desde globales PHP
 $request = Request::createFromGlobals();
 
+//var_dump($request);die;
+
 // carga rutas de la app
 $routes = include __DIR__.'/../src/app.php';
+
+//var_dump($routes);die;
 
 // obtiene contexto de la petición
 $context = new Routing\RequestContext();
 $context->fromRequest($request);
 
+//var_dump($context);die;
+
 // crea nuevo matcher seteando contexto y la tabla de rutas de la app
 $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
+
+//var_dump($matcher);die;
 
 // crea un controller resolver
 $resolver = new HttpKernel\Controller\ControllerResolver();
 
+//var_dump($resolver);die;
+
 // crea una instancia del framework
-$framework = new Simplex\Framework($matcher, $resolver);
+$framework = new Simplex\Framework($dispatcher, $matcher, $resolver);
+
+//var_dump($framework);die;
 
 // usa el handle del framework para resolver el request en un response
 $response = $framework->handle($request);

@@ -15,6 +15,7 @@ class Framework
 {
     protected $matcher;
     protected $resolver;
+    protected $dispatcher;
  
     public function __construct(EventDispatcher $dispatcher, UrlMatcherInterface $matcher, ControllerResolverInterface $resolver)
     {
@@ -40,6 +41,8 @@ class Framework
         } catch (\Exception $e) {
             $response = new Response('An error occurred', 500);
         }
+
+        //var_dump($response);die;
 
         // llama a evento previo al retorno de la respuesta
         $this->dispatcher->dispatch('response', new ResponseEvent($response, $request));
